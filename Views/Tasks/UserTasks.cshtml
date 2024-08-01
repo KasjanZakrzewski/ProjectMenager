@@ -1,0 +1,45 @@
+﻿@model IEnumerable<ProjectMenager.Models.Task>
+@using Microsoft.AspNetCore.Html;
+@using NonFactors.Mvc.Grid;
+@{
+    ViewData["Title"] = "Index";
+
+    @if (User.IsInRole("Employee"))
+    {
+        Layout = "~/Views/Shared/_Layout_Employee.cshtml";
+    }
+}
+
+<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
+
+<h1>Tasks:</h1>
+@if (Model != null)
+{
+    @(
+            Html
+            .Grid(Model)
+            .Build(c =>
+            {
+                c.Add(Model => Model.Name).Titled("Name");
+                c.Add(Model => Model.Status).Titled("Status");
+
+                if (User.IsInRole("Employee"))
+                {
+                    c.Add(Model => Model.Id).Titled("Actions")
+                                    .RenderedAs(model => new HtmlString($"<a href='/Tasks/Details/{model.Id}'> Details </a> | <a href='/Notes/Create/{model.Id}'> add Notes </a> | <a href='/Tasks/Begin/{model.Id}'> Begin </a> | <a href='/Tasks/Aprove/{model.Id}'> End </a>"));
+                }
+            }
+            ).Filterable()
+            .Pageable(pager =>
+            {
+                pager.PageSizes = new Dictionary<int, string> { { 0, "all" } };
+                pager.PagesToDisplay = 3;
+                pager.RowsPerPage = 5;
+            })
+            .Sortable()
+            )
+}
+else
+{
+    <p>---</p>
+}

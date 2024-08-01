@@ -1,0 +1,103 @@
+﻿@model MyModel<Item, List<ProjectMenager.Models.Task>>
+@using Microsoft.AspNetCore.Html;
+@using NonFactors.Mvc.Grid;
+@{
+    ViewData["Title"] = "Details";
+    @if (User.IsInRole("Administrator"))
+    {
+        Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    }
+}
+<link href="~/css/mvc-grid/mvc-grid.css" rel="stylesheet" />
+
+<h1>Details</h1>
+
+<div>
+    <h4>Item</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.priority)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.priority)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.Status)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.Status)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.StartDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.StartDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.EndDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.EndDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Obj1.Project)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Obj1.Project.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Obj1.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<div>
+    <hr />
+    <h4>Tasks:</h4>
+    <a asp-controller="Tasks" asp-action="Create" asp-route-id="@Model?.Obj1.Id">Add New</a>
+    @if (Model.Obj2 != null)
+    {
+        @(
+            Html
+            .Grid(Model.Obj2)
+            .Build(c =>
+            {
+                c.Add(Model => Model.Name).Titled("Name");
+                c.Add(Model => Model.Status).Titled("Status");
+                c.Add(Model => Model.Employee.UserName).Titled("Employee");
+
+                if (User.IsInRole("ProjectManager"))
+                {
+                    c.Add(Model => Model.Id).Titled("Actions")
+                    .RenderedAs(model => new HtmlString($"<a href='/Tasks/Details/{model.Id}'> Details </a> | <a href='/Tasks/Aprove/{model.Id}'> Aprove </a> | <a href='/Tasks/Busted/{model.Id}'> Disaprove </a> | <a href='/Tasks/Delete/{model.Id}'> Remove </a>"));
+                }
+            }
+            ).Filterable()
+            .Pageable(pager =>
+            {
+                pager.PageSizes = new Dictionary<int, string> { { 0, "all" } };
+                pager.PagesToDisplay = 3;
+                pager.RowsPerPage = 5;
+            })
+            .Sortable()
+            )
+    }
+    else
+    {
+        <p>---</p>
+    }
+</div>

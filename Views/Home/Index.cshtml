@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    @if (User.IsInRole("Administrator"))
+    {
+        Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    }
+    @if (User.IsInRole("ProjectManager"))
+    {
+        Layout = "~/Views/Shared/_Layout_Project.cshtml";
+    }
+    @if (User.IsInRole("Employee"))
+    {
+        Layout = "~/Views/Shared/_Layout_Employee.cshtml";
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
