@@ -11,7 +11,7 @@ using ProjectMenager.Models;
 
 namespace ProjectMenager.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator, Employee")]
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,6 +22,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Notes
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Notes.Include(n => n.Task);
@@ -29,6 +30,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Notes/Details/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Notes == null)
@@ -48,7 +50,6 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Notes/Create
-        [Authorize(Roles = "Employee")]
         public IActionResult Create(int? Id)
         {
             if (Id != null)
@@ -68,7 +69,6 @@ namespace ProjectMenager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Create([Bind("Note,TaskId")] Notes notes)
         {
             notes.Date = DateTime.Now;
@@ -76,6 +76,10 @@ namespace ProjectMenager.Controllers
             {
                 _context.Add(notes);
                 await _context.SaveChangesAsync();
+                if (User.IsInRole("Employee"))
+                {
+                    return RedirectToAction("UserTasks", "Tasks");
+                }
                 return RedirectToAction(nameof(Index));
             }
             ViewData["TaskId"] = new SelectList(_context.Task, "Id", "Id", notes.TaskId);
@@ -83,6 +87,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Notes/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Notes == null)
@@ -104,6 +109,7 @@ namespace ProjectMenager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Note,TaskId")] Notes notes)
         {
             if (id != notes.Id)
@@ -136,6 +142,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Notes/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Notes == null)
@@ -157,6 +164,7 @@ namespace ProjectMenager.Controllers
         // POST: Notes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Notes == null)

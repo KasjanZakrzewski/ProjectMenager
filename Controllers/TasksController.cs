@@ -12,7 +12,7 @@ using ProjectMenager.Models;
 
 namespace ProjectMenager.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize(Roles = "Administrator, ProjectManager, Employee")]
     public class TasksController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,13 +26,13 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Task.Include(t => t.Employee).Include(t => t.Item);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> UserTasks()
         {
             var Id = _UserManager.GetUserId(User);
@@ -41,7 +41,6 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Details/5
-        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Task == null)
@@ -74,6 +73,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create(int? Id)
         {
             ViewData["EmployeeId"] = new SelectList(_context.Users, "Id", "Id");
@@ -94,6 +94,7 @@ namespace ProjectMenager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create([Bind("Name,Description,Status,ItemId,EmployeeId")] Models.Task task)
         {
             if (ModelState.IsValid)
@@ -108,6 +109,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Task == null)
@@ -130,6 +132,7 @@ namespace ProjectMenager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Status,ItemId,EmployeeId")] Models.Task task)
         {
             if (id != task.Id)
@@ -163,6 +166,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Task == null)
@@ -185,6 +189,7 @@ namespace ProjectMenager.Controllers
         // POST: Tasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Task == null)
@@ -202,7 +207,6 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Edit/5
-        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Aprove(int? id)
         {
             if (id == null || _context.Task == null)
@@ -260,7 +264,6 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Edit/5
-        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Begin(int? id)
         {
             if (id == null || _context.Task == null)
@@ -295,6 +298,7 @@ namespace ProjectMenager.Controllers
         }
 
         // GET: Tasks/Edit/5
+        [Authorize(Roles = "Administrator, ProjectManager")]
         public async Task<IActionResult> Busted(int? id)
         {
             if (id == null || _context.Task == null)
