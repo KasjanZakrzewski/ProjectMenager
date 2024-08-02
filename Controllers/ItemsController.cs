@@ -86,6 +86,10 @@ namespace ProjectMenager.Controllers
             {
                 _context.Add(item);
                 await _context.SaveChangesAsync();
+                if (User.IsInRole("ProjectManager"))
+                {
+                    return RedirectToAction("Details", "Projects", new { id = item.ProjectId });
+                }
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Id", item.ProjectId);
@@ -180,6 +184,10 @@ namespace ProjectMenager.Controllers
             }
             
             await _context.SaveChangesAsync();
+            if (User.IsInRole("ProjectManager"))
+            {
+                return RedirectToAction("Details", "Projects", new { id = item.ProjectId });
+            }
             return RedirectToAction(nameof(Index));
         }
 
